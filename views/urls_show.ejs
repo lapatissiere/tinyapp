@@ -12,6 +12,7 @@
   </head>
 
   <body>
+    <%- include ('partials/_header') %>
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
@@ -40,8 +41,3 @@
     ></script>
   </body>
 </html>
-
-app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: /* What goes here? */ };
-  res.render("urls_show", templateVars);
-});
