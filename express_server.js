@@ -9,9 +9,48 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-function generateRandomString(len, arr) {
+function generateRandomString(len) {
+  const arr = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "e",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+  ];
   let ans = "";
-  for (let i = len; i > 0; i--) {
+  for (let i = 0; i < len; i++) {
     ans += arr[Math.floor(Math.random() * arr.length)];
   }
   return ans;
@@ -19,6 +58,13 @@ function generateRandomString(len, arr) {
 
 app.get("/", (req, res) => {
   res.send("Hello!");
+});
+
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  console.log(longURL);
+  res.redirect(longURL);
+  console.log(req.params.id);
 });
 
 app.listen(PORT, () => {
@@ -49,5 +95,10 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const randomString = generateRandomString(6);
+  console.log(randomString);
+  urlDatabase[randomString] = req.body.longURL;
+  console.log(urlDatabase);
+  //res.redirect(`/u/${randomString}`);
+  res.send("Ok"); //Respond with 'Ok' (we will replace this)
 });
