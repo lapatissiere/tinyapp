@@ -102,3 +102,11 @@ app.post("/urls", (req, res) => {
   //res.redirect(`/u/${randomString}`);
   res.send("Ok"); //Respond with 'Ok' (we will replace this)
 });
+
+app.post("/urls/:id/delete", (req, res) => {
+  const shortId = req.params.id;
+  const longURL = urlDatabase[shortId]
+  console.log("This is longURL ", longURL);
+    delete urlDatabase[shortId];
+    res.redirect("/urls");
+}); 
