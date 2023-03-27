@@ -54,7 +54,7 @@ function generateRandomString(len) {
     ans += arr[Math.floor(Math.random() * arr.length)];
   }
   return ans;
-}
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -110,3 +110,12 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[shortId];
     res.redirect("/urls");
 }); 
+
+app.post("/urls/:id", (req, res) => {
+  const shortId = req.params.id;
+  const longURL = req.body.updateURL
+  console.log("This is longURL ", longURL);
+  urlDatabase[shortId] = longURL;
+    res.redirect("/urls");
+}); 
+
