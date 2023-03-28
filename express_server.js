@@ -1,10 +1,16 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ["abcde"],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -56,7 +62,7 @@ function generateRandomString(len) {
     ans += arr[Math.floor(Math.random() * arr.length)];
   }
   return ans;
-};
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -94,9 +100,9 @@ const users = {
   },
 };
 
-  const getUserByEmail = (email, users) => {
-    return Object.values(users).find(user => user.email === email);
-  };
+const getUserByEmail = (email, users) => {
+  return Object.values(users).find((user) => user.email === email);
+};
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
@@ -105,7 +111,7 @@ app.post("/register", (req, res) => {
   const user = {
     id: newUserID,
     email: email,
-    password: password
+    password: password,
   };
   if (!email || !password) {
     // let templateVars = {
@@ -113,31 +119,30 @@ app.post("/register", (req, res) => {
     //   message: "Email and/or password missing",
     //   user: users[req.session.user_id],
     // }
-    res.status(400);
-    res.send("Email and/or password missing");
-  } else if (getUserByEmail(email, users)) {
+    return res.status(400).send("Email and/or password missing");
+  }
+  if (getUserByEmail(email, users)) {
     // let templateVars = {
     //   status: 400,
     //   message: "This email is already registered",
     //   user: users[req.session.user_id],
     // }
-    res.status(400);
-    res.send("This email is already registered");
-  } else if (!userEmail) {
-    users[newUserID] = userObj;
-    req.session["user_id"] = newUserID;
-    res.redirect("/urls");
+    return res.status(400).send("This email is already registered");
   }
+
+  users[newUserID] = user;
+  req.session.user_id = newUserID;
+  return res.redirect("/urls");
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase , user: users[req.session.user_id],};
+  let templateVars = { urls: urlDatabase, user: users[req.session.user_id] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: users[req.session.user_id]
+    user: users[req.session.user_id],
   };
   res.render("urls_new", templateVars);
 });
@@ -152,20 +157,18 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render("urls_registration", templateVars);
+  // let templateVars = {user: users[req.session.user_id]};
+  res.render("urls_registration");
 });
 
 app.get("/login", (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id]
-  };
-  if (templateVars.user) {
-    res.redirect("/urls");
-  } else {
+  if (!req.session.user_id) {
+    let templateVars = {
+      user: users[req.session.user_id],
+    };
     res.render("urls_login", templateVars);
+  } else {
+    res.redirect("/urls");
   }
 });
 
@@ -180,26 +183,41 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
   const shortId = req.params.id;
-  const longURL = urlDatabase[shortId]
+  const longURL = urlDatabase[shortId];
   console.log("This is longURL ", longURL);
-    delete urlDatabase[shortId];
-    res.redirect("/urls");
-}); 
+  delete urlDatabase[shortId];
+  res.redirect("/urls");
+});
 
 app.post("/urls/:id", (req, res) => {
   const shortId = req.params.id;
-  const longURL = req.body.updateURL
+  const longURL = req.body.updateURL;
   console.log("This is longURL ", longURL);
   urlDatabase[shortId] = longURL;
-    res.redirect("/urls");
-}); 
+  res.redirect("/urls");
+});
 
 app.post("/login", (req, res) => {
-  res.cookie("user ID", req.body.user_id);
-  res.redirect("/urls");
-})
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = getUserByEmail(email, users);
+  if (user) {
+    if ((password === user.password)) {
+      const user_id = user.id;
+      // set cookie with user id
+      req.session["user_id"] = user_id;
+      res.redirect("/urls");
+    } else {
+      res.status(403).send("403 Forbidden: Wrong Password");
+      res.redirect("/urls");
+    }
+  } else {
+    res.status(403).send("403 Forbidden : Please Register");
+    res.redirect("/urls");
+  }
+});
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user ID", req.body.user_id);
-  res.redirect("/urls");
+  res.clearCookie("user_id", req.body.user_id);
+  res.redirect("/login");
 });

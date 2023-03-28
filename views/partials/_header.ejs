@@ -17,7 +17,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <% if (user) { %>
+      <% if (user && user.email) { %>
         <form class="logout" action="/logout" method="POST">
           <%= user.email %>
           <button type="submit">Logout</button>
@@ -30,17 +30,6 @@
           <button type="submit">Register</button>
         </form>
         <% } %>
-        <!-- <form class="login" action="/login" method="POST">
-          <% if(user.email){ %>
-            <p> Logged in as : <%= email %></p>
-            <form action="/logout"   method="POST" >
-             <button  type="submit"> Logout </button> 
-           </form>
-              <% } else { %>
-                <input name="user.email" placeholder="Email" type="text">
-                <button type="submit" class="login-btn">Login</button>
-                <% } %>
-        </form> -->
       </div>
   </nav>
 </header>
