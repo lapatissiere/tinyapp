@@ -81,31 +81,101 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
+  const getUserByEmail = (email, users) => {
+    return Object.values(users).find(user => user.email === email);
+  };
+
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const newUserID = generateRandomString();
+  const user = {
+    id: newUserID,
+    email: email,
+    password: password
+  };
+  if (!email || !password) {
+    // let templateVars = {
+    //   status: 400,
+    //   message: "Email and/or password missing",
+    //   user: users[req.session.user_id],
+    // }
+    res.status(400);
+    res.send("Email and/or password missing");
+  } else if (getUserByEmail(email, users)) {
+    // let templateVars = {
+    //   status: 400,
+    //   message: "This email is already registered",
+    //   user: users[req.session.user_id],
+    // }
+    res.status(400);
+    res.send("This email is already registered");
+  } else if (!userEmail) {
+    users[newUserID] = userObj;
+    req.session["user_id"] = newUserID;
+    res.redirect("/urls");
+  }
+});
+
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase , username: req.cookies["username"],};
+  let templateVars = { urls: urlDatabase , user: users[req.session.user_id],};
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
+  let templateVars = {
+    user: users[req.session.user_id]
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: "www.lighthouselabs.com" , username: req.cookies["username"]};
+  let templateVars = {
+    id: req.params.id,
+    longURL: "www.lighthouselabs.com",
+    user: users[req.session.user_id],
+  };
   res.render("urls_show", templateVars);
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = {
+    user: users[req.session.user_id]
+  };
+  res.render("urls_registration", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user: users[req.session.user_id]
+  };
+  if (templateVars.user) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_login", templateVars);
+  }
+});
+
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  console.log(req.body);
   const randomString = generateRandomString(6);
   console.log(randomString);
   urlDatabase[randomString] = req.body.longURL;
   console.log(urlDatabase);
-  //res.redirect(`/u/${randomString}`);
-  res.send("Ok"); //Respond with 'Ok' (we will replace this)
+  res.send("Ok");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -125,11 +195,11 @@ app.post("/urls/:id", (req, res) => {
 }); 
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  res.cookie("user ID", req.body.user_id);
   res.redirect("/urls");
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username", req.body.username);
+  res.clearCookie("user ID", req.body.user_id);
   res.redirect("/urls");
 });
