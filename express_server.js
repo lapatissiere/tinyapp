@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
+const getUserByEmail = require("./helpers.js")
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(
@@ -113,13 +114,9 @@ const users = {
   },
 };
 
-const getUserByEmail = (email, users) => {
-  return Object.values(users).find((user) => user.email === email);
-};
-
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  const password = "purple-monkey-dinosaur"; 
+  const password = "purple-monkey-dinosaur";
   const hashedPassword = bcrypt.hashSync(password, 10);
   const newUserID = generateRandomString();
   const user = {
@@ -135,7 +132,7 @@ app.post("/register", (req, res) => {
     // }
     return res.status(400).send("Email and/or password missing");
   }
-  if (getUserByEmail(email, users)) {
+  if (getUserByEmail) {
     // let templateVars = {
     //   status: 400,
     //   message: "This email is already registered",
@@ -314,15 +311,15 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = "purple-monkey-dinosaur";
-const hashedPassword = bcrypt.hashSync(password, 10);
-  const user = getUserByEmail(email, users);
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const user = getUserByEmail;
   if (user) {
     if (bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword)) {
       const user_id = user.id;
       // set cookie with user id
-      req.session["user_id"] = user_id;
+      req.session.user_id = user_id;
       return res.redirect("/urls");
-    } 
+    }
     if (bcrypt.compareSync("pink-donkey-minotaur", hashedPassword)) {
       return res.status(403).send("403 Forbidden: Wrong Password");
     }
