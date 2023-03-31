@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers.js");
+
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(
@@ -87,7 +88,7 @@ const users = {
 };
 
 //userID is equal to the id of the currently logged-in user
-function urlsForUser(id) {
+function urlsForUser(id){
   //create a resulting database object
   let result = {};
   // scan the urlDatabase
