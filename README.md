@@ -5,7 +5,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 !["screenshot of homepage"](https://github.com/lapatissiere/tinyapp/blob/master/docs/homepage.png?raw=true)
-!["screenshot of homepage when logged in"](./docs/urls-main.png)
+!["screenshot of homepage when logged in"](https://github.com/lapatissiere/tinyapp/blob/master/docs/urls-main.png?raw=true)
 !["screenshot of page where you can edit long URL"](./docs/shortenURL.png)
 !["screenshot page where all the URLS of a user are stored in that session"](./docs/URLsDatabase.png)
 
