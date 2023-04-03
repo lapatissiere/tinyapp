@@ -1,10 +1,11 @@
 const express = require("express");
-const app = express();
-const PORT = 8080; // default port 8080
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers.js");
-
+const generateRandomString = require("./helpers.js");
+const urlsForUser = require("./helpers.js");
+const urlDatabase = require("./database.js");
+const users = require("./database.js");
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(
@@ -15,92 +16,8 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
-
-function generateRandomString(len) {
-  const arr = [
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "e",
-    "g",
-    "h",
-    "i",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "o",
-    "p",
-    "q",
-    "r",
-    "s",
-    "t",
-    "u",
-    "v",
-    "w",
-    "x",
-    "y",
-    "z",
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-  ];
-  let ans = "";
-  for (let i = 0; i < len; i++) {
-    ans += arr[Math.floor(Math.random() * arr.length)];
-  }
-  return ans;
-}
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
-
-//userID is equal to the id of the currently logged-in user
-function urlsForUser(id){
-  //create a resulting database object
-  let result = {};
-  // scan the urlDatabase
-  for (let key in urlDatabase) {
-    // if userID(urlDatabase) = id
-    if (urlDatabase[key].userID === id) {
-      //push object into resulting database
-      result[key] = urlDatabase[key];
-    }
-  }
-  return result;
-}
+const app = express();
+const PORT = 8080; // default port 8080
 
 app.get("/", (req, res) => {
   res.send("Hello!");
