@@ -42,6 +42,7 @@ function generateRandomString(len) {
   for (let i = 0; i < len; i++) {
     ans += arr[Math.floor(Math.random() * arr.length)];
   }
+  console.log("String:" , ans)
   return ans;
 };
 
@@ -56,7 +57,7 @@ const getUserByEmail = (email, users) => {
 };
 
 //userID is equal to the id of the currently logged-in user
-function urlsForUser(id){
+function urlsForUser(id, urlDatabase){
   //create a resulting database object
   let result = {};
   // scan the urlDatabase
@@ -70,4 +71,4 @@ function urlsForUser(id){
   return result;
 };
 
-module.exports =  getUserByEmail, generateRandomString, urlsForUser ;
+module.exports =  {getUserByEmail, generateRandomString, urlsForUser} ;
